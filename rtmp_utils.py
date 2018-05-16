@@ -17,7 +17,7 @@ from librtmp.amf import encode_amf
 from librtmp.exceptions import *
 from id3v2tag_utils import *
 
-DEFAULT_STREAM = "rtmp://localhost:1835/hls" #FIXME, this should come from env in container.
+DEFAULT_STREAM = "rtmp://localhost:1935/hls" #FIXME, this should come from env in container.
 def inject(stream, id3tag):
 	state = 0
 	text = "Injected Successful"
