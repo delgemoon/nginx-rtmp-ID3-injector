@@ -16,13 +16,17 @@ from librtmp.packet import RTMPPacket, PACKET_TYPE_INVOKE, PACKET_SIZE_MEDIUM
 from librtmp.amf import encode_amf
 from librtmp.exceptions import *
 from id3v2tag_utils import *
+import os
 
 DEFAULT_STREAM = "rtmp://localhost:1935/hls" #FIXME, this should come from env in container.
 def inject(stream, id3tag):
 	state = 0
 	text = "Injected Successful"
+	hls_stream = os.getenv("STREAM_URL", "")
+	if hls_stream == "":
+		hls_stream = DEFAULT_STREAM
 	try:
-		stream = "/".join((DEFAULT_STREAM,stream))
+		stream = "/".join((hls_stream , stream))
 		conn = RTMP(stream, live=True)
 		conn.connect()
 		method = "onIDTag3v2" # Define in nginx-rtmp too
