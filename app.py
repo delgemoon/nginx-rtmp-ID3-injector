@@ -80,9 +80,6 @@ def insert_ads(req):
         adID = "adID" # description
         id3tag = generate_txxx(adID,url)
         if  id3tag is not None:
-            length = len(id3tag)
-            lenghtByte = length.to_bytes(2, 'little')
-            id3tag = lenghtByte + id3tag
             rt, displayText = inject(stream, id3tag)    
             if rt == 0:
                 state = "complete"

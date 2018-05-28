@@ -22,16 +22,28 @@ DEFAULT_STREAM = "rtmp://localhost:1935/hls" #FIXME, this should come from env i
 def inject(stream, id3tag):
 	state = 0
 	text = "Injected Successful"
-	hls_stream = os.getenv("STREAM_URL", "")
-	if hls_stream == "":
-		hls_stream = DEFAULT_STREAM
+	url_prefix = os.getenv("STREAM_URL", "")
+	if url_prefix == "":
+		url_prefix = DEFAULT_STREAM
 	try:
-		stream = "/".join((hls_stream , stream))
-		conn = RTMP(stream, live=True)
+		stream_url = "/".join((url_prefix , stream))
+		conn = RTMP(stream_url, live=True)
 		conn.connect()
 		method = "onIDTag3v2" # Define in nginx-rtmp too
+		# encode the new method
 		method_encoded = encode_amf(method)
-		body =  method_encoded + id3tag
+		# forward stream name
+		stream = stream.encode()
+		print ( stream )
+		length = len(stream)
+		print ( length )
+		lenghtByte = length.to_bytes(2, 'little')
+		stream = lenghtByte + stream
+		# forward data byte
+		length = len(id3tag)
+		lenghtByte = length.to_bytes(2, 'little')
+		id3tag = lenghtByte + id3tag
+		body =  method_encoded + stream + id3tag
 		packet = RTMPPacket(type=PACKET_TYPE_INVOKE, format=PACKET_SIZE_MEDIUM, channel=0x03, body=body)
 		conn.send_packet(packet)
 	except RTMPError as e:
